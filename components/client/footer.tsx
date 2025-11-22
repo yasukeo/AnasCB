@@ -65,7 +65,7 @@ export function Footer() {
                   href="/conditions-utilisation" 
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Conditions d'utilisation
+                  Conditions d&apos;utilisation
                 </Link>
               </li>
               <li>

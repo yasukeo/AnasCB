@@ -1,4 +1,4 @@
-import { format, formatDistance, formatRelative } from 'date-fns'
+import { format, formatDistance } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
 /**

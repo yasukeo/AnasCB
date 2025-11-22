@@ -5,6 +5,7 @@ import { formatPrix, formatDate } from '@/lib/utils/format';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CheckCircle, Package, Mail, Home } from 'lucide-react';
+import type { OrderItem } from '@/types/order';
 
 interface ConfirmationPageProps {
   params: {
@@ -114,7 +115,7 @@ export default async function ConfirmationPage({ params }: ConfirmationPageProps
             
             {/* Articles */}
             <div className="space-y-3 mb-6 pb-6 border-b">
-              {order.order_items.map((item: any) => (
+              {order.order_items.map((item: OrderItem) => (
                 <div key={item.id} className="flex justify-between items-start">
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{item.nom_produit}</p>
@@ -195,14 +196,14 @@ export default async function ConfirmationPage({ params }: ConfirmationPageProps
               <Link href="/boutique">Continuer mes achats</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="flex-1">
-              <Link href="/">Retour à l'accueil</Link>
+              <Link href="/">Retour à l&apos;accueil</Link>
             </Button>
           </div>
 
           {/* Aide */}
           <div className="mt-8 p-4 bg-gray-100 rounded-lg text-center">
             <p className="text-sm text-gray-600">
-              Besoin d'aide ?{' '}
+              Besoin d&apos;aide ?{' '}
               <a href="mailto:contact@anascb.ma" className="text-blue-600 hover:underline">
                 Contactez-nous
               </a>{' '}

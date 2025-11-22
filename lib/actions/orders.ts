@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { checkoutSchema, type CheckoutFormData } from '@/lib/validations/checkout';
 import { CartItem } from '@/types/cart';
+import type { Order } from '@/types/order';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -152,7 +153,7 @@ export async function createOrder(params: CreateOrderParams) {
   }
 }
 
-function generateOrderConfirmationEmail(order: any, items: CartItem[]): string {
+function generateOrderConfirmationEmail(order: Order, items: CartItem[]): string {
   const itemsHtml = items
     .map(
       (item) => `

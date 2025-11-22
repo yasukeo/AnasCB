@@ -1,4 +1,3 @@
-import { Suspense } from 'react'
 import { getProducts, getCategories } from '@/lib/actions/products'
 import { ProductCard } from '@/components/client/product-card'
 import { Button } from '@/components/ui/button'

@@ -270,7 +270,7 @@ export function AddToCartForm({
       {!isAvailable && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm text-red-800 font-medium">
-            Cette combinaison n'est pas disponible actuellement.
+            Cette combinaison n&apos;est pas disponible actuellement.
           </p>
         </div>
       )}

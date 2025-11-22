@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Loader2, ShoppingBag, Lock } from 'lucide-react';
 import { toast } from '@/lib/hooks/use-toast';
 import { useHasHydrated } from '@/lib/hooks/use-hydrated';
+import { ZodError } from 'zod';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -93,22 +94,23 @@ export default function CheckoutPage() {
         toast.error(result.error || 'Erreur lors de la création de la commande');
         setIsSubmitting(false);
       }
-    } catch (error: any) {
+    } catch (error) {
       setIsSubmitting(false);
-      
-      // Erreurs de validation Zod
-      if (error.errors) {
+
+      if (error instanceof ZodError) {
         const formErrors: Record<string, string> = {};
-        error.errors.forEach((err: any) => {
-          if (err.path) {
-            formErrors[err.path[0]] = err.message;
+        error.issues.forEach((issue) => {
+          const fieldKey = issue.path[0];
+          if (typeof fieldKey === 'string') {
+            formErrors[fieldKey] = issue.message;
           }
         });
         setErrors(formErrors);
         toast.error('Veuillez corriger les erreurs dans le formulaire');
-      } else {
-        toast.error('Une erreur est survenue. Veuillez réessayer.');
+        return;
       }
+
+      toast.error('Une erreur est survenue. Veuillez réessayer.');
     }
   };
 
@@ -268,7 +270,7 @@ export default function CheckoutPage() {
 
                   <div>
                     <Label htmlFor="adresse2">
-                      Complément d'adresse <span className="text-gray-400">(optionnel)</span>
+                      Complément d&apos;adresse <span className="text-gray-400">(optionnel)</span>
                     </Label>
                     <Input
                       id="adresse2"

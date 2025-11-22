@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { getProductBySlug, getSimilarProducts } from '@/lib/actions/products';
 import { formatPrix } from '@/lib/utils/format';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/client/product-card';
 import { AddToCartForm } from '@/components/client/add-to-cart-form';
 import { ChevronRight } from 'lucide-react';

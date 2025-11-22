@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useCart } from '@/lib/hooks/use-cart';
 import { formatPrix } from '@/lib/utils/format';
 import { FRAIS_LIVRAISON } from '@/lib/utils/constants';
@@ -16,7 +15,6 @@ import { toast } from '@/lib/hooks/use-toast';
 import { useHasHydrated } from '@/lib/hooks/use-hydrated';
 
 export default function PanierPage() {
-  const router = useRouter();
   const { items, updateQuantity, removeItem, clearCart, totalItems, sousTotal } = useCart();
   const hasHydrated = useHasHydrated();
   const [promoCode, setPromoCode] = useState('');
