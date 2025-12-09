@@ -12,18 +12,19 @@ import { Filter, SlidersHorizontal } from 'lucide-react'
 import { ProductSortBy } from '@/types/product'
 
 interface BoutiquePageProps {
-  searchParams: {
+  searchParams: Promise<{
     categorie?: string
     tri?: ProductSortBy
     search?: string
-  }
+  }>
 }
 
 export default async function BoutiquePage({ searchParams }: BoutiquePageProps) {
   // Récupérer les paramètres
-  const categorySlug = searchParams.categorie
-  const sortBy = (searchParams.tri || 'recent') as ProductSortBy
-  const search = searchParams.search
+  const params = await searchParams
+  const categorySlug = params.categorie
+  const sortBy = (params.tri || 'recent') as ProductSortBy
+  const search = params.search
 
   // Récupérer les produits et catégories
   const [products, categories] = await Promise.all([

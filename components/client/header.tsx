@@ -2,17 +2,26 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingCart, Menu, Search } from 'lucide-react'
+import { ShoppingCart, Menu, Search, User, LayoutDashboard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import { useCart } from '@/lib/hooks/use-cart'
 import { useHasHydrated } from '@/lib/hooks/use-hydrated'
 import { CATEGORIES } from '@/lib/utils/constants'
 import { useState } from 'react'
+import { logout } from '@/lib/actions/auth'
 
-export function Header() {
+interface HeaderProps {
+  user?: {
+    id: string
+    email: string | null
+    role: string
+  } | null
+}
+
+export function Header({ user }: HeaderProps) {
   const { totalItems } = useCart()
   const hasHydrated = useHasHydrated()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -82,6 +91,55 @@ export function Header() {
                 <span className="sr-only">Rechercher</span>
               </Link>
             </Button>
+
+            {/* User Menu */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <User className="h-5 w-5" />
+                    <span className="sr-only">Mon compte</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-medium">{user.email}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  {user.role === 'ADMIN' && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin" className="cursor-pointer">
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        Dashboard Admin
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem asChild>
+                    <Link href="/compte" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Mon Compte
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer text-red-600"
+                    onSelect={async () => {
+                      await logout()
+                    }}
+                  >
+                    Déconnexion
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/connexion">
+                  <User className="h-5 w-5" />
+                  <span className="sr-only">Se connecter</span>
+                </Link>
+              </Button>
+            )}
 
             {/* Panier */}
             <Button variant="ghost" size="icon" className="relative" asChild>
