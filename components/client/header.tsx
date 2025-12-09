@@ -56,7 +56,7 @@ export function Header({ user }: HeaderProps) {
             {/* Menu Catégories */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="text-sm font-medium">
+                <Button variant="ghost" className="text-sm font-medium" suppressHydrationWarning>
                   Catégories
                 </Button>
               </DropdownMenuTrigger>
@@ -96,7 +96,7 @@ export function Header({ user }: HeaderProps) {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" suppressHydrationWarning>
                     <User className="h-5 w-5" />
                     <span className="sr-only">Mon compte</span>
                   </Button>
@@ -160,7 +160,7 @@ export function Header({ user }: HeaderProps) {
             {/* Menu Mobile */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" suppressHydrationWarning>
                   <Menu className="h-5 w-5" />
                   <span className="sr-only">Menu</span>
                 </Button>

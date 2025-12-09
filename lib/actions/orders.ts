@@ -294,3 +294,38 @@ function generateOrderConfirmationEmail(order: Order, items: CartItem[]): string
     </html>
   `;
 }
+
+export async function updateOrderStatus(orderId: string, status: string) {
+  try {
+    const supabase = getAdminClient()
+
+    const { error } = await supabase
+      .from('orders')
+      .update({
+        status,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', orderId)
+
+    if (error) {
+      console.error('Error updating order status:', error)
+      return {
+        success: false,
+        error: 'Erreur lors de la mise à jour du statut',
+      }
+    }
+
+    revalidatePath('/admin/commandes')
+    revalidatePath(`/admin/commandes/${orderId}`)
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error('Error updating order status:', error)
+    return {
+      success: false,
+      error: 'Une erreur est survenue',
+    }
+  }
+}

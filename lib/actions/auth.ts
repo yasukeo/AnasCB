@@ -166,8 +166,9 @@ export async function getUser() {
       return null
     }
 
-    // Get user role
-    const { data: userData } = await supabase
+    // Use admin client to bypass RLS and get user role
+    const adminSupabase = getAdminClient()
+    const { data: userData } = await adminSupabase
       .from('users')
       .select('role')
       .eq('id', user.id)
