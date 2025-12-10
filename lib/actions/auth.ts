@@ -18,67 +18,55 @@ interface SignupParams {
 }
 
 export async function login(params: LoginParams) {
-  try {
-    const supabase = await createClient()
+  const supabase = await createClient()
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: params.email,
-      password: params.password,
-    })
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: params.email,
+    password: params.password,
+  })
 
-    if (error) {
-      return {
-        success: false,
-        error: 'Email ou mot de passe incorrect',
-      }
-    }
-
-    if (!data.user) {
-      return {
-        success: false,
-        error: 'Erreur de connexion',
-      }
-    }
-
-    // Get user role from users table
-    let { data: userData } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', data.user.id)
-      .single()
-
-    // If user not in users table, create the record
-    if (!userData) {
-      const adminSupabase = getAdminClient()
-      const { error: insertError } = await adminSupabase
-        .from('users')
-        .insert({
-          id: data.user.id,
-          email: data.user.email || '',
-          role: 'CLIENT',
-        })
-      
-      if (!insertError) {
-        userData = { role: 'CLIENT' }
-      }
-    }
-
-    revalidatePath('/', 'layout')
-
-    return {
-      success: true,
-      user: {
-        id: data.user.id,
-        email: data.user.email,
-        role: userData?.role || 'CLIENT',
-      },
-    }
-  } catch (error) {
-    console.error('Login error:', error)
+  if (error) {
     return {
       success: false,
-      error: 'Une erreur est survenue lors de la connexion',
+      error: 'Email ou mot de passe incorrect',
     }
+  }
+
+  if (!data.user) {
+    return {
+      success: false,
+      error: 'Erreur de connexion',
+    }
+  }
+
+  // Get user role from users table
+  let { data: userData } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', data.user.id)
+    .single()
+
+  // If user not in users table, create the record
+  if (!userData) {
+    const adminSupabase = getAdminClient()
+    const { error: insertError } = await adminSupabase
+      .from('users')
+      .insert({
+        id: data.user.id,
+        email: data.user.email || '',
+        role: 'CLIENT',
+      })
+    
+    if (!insertError) {
+      userData = { role: 'CLIENT' }
+    }
+  }
+
+  revalidatePath('/', 'layout')
+
+  return {
+    success: true,
+    role: userData?.role || 'CLIENT',
   }
 }
 
@@ -166,18 +154,25 @@ export async function getUser() {
       return null
     }
 
-    // Use admin client to bypass RLS and get user role
-    const adminSupabase = getAdminClient()
-    const { data: userData } = await adminSupabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+    // Try to get role from users table, with timeout
+    let role = 'CLIENT'
+    try {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      
+      role = userData?.role || 'CLIENT'
+    } catch (roleError) {
+      // If role fetch fails, just use CLIENT as default
+      console.log('Could not fetch role, using CLIENT as default')
+    }
 
     return {
       id: user.id,
       email: user.email,
-      role: userData?.role || 'CLIENT',
+      role: role,
     }
   } catch (error) {
     console.error('Get user error:', error)

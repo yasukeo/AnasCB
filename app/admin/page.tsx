@@ -134,9 +134,9 @@ export default async function AdminDashboardPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">{order.total_amount.toFixed(2)} DHS</p>
+                    <p className="font-medium">{(order.total_amount ?? 0).toFixed(2)} DHS</p>
                     <p className="text-sm text-muted-foreground capitalize">
-                      {order.status}
+                      {order.status || 'En attente'}
                     </p>
                   </div>
                 </Link>

@@ -9,48 +9,67 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, Lock, Mail } from 'lucide-react'
-import { login } from '@/lib/actions/auth'
+import { createBrowserClient } from '@supabase/ssr'
 import { toast } from '@/lib/hooks/use-toast'
 
 export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  })
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      const result = await login(formData)
+      // Use browser client for login
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
 
-      if (result.success) {
-        toast.success('Connexion réussie !')
-        
-        // Redirect based on user role
-        if (result.user?.role === 'ADMIN') {
-          router.push('/admin')
-        } else {
-          router.push('/compte')
-        }
-      } else {
-        toast.error(result.error || 'Erreur de connexion')
+      console.log('Attempting login with:', email)
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      console.log('Login response:', { data, error })
+
+      if (error) {
+        console.error('Login error from Supabase:', error)
+        toast.error('Email ou mot de passe incorrect')
+        setIsLoading(false)
+        return
       }
-    } catch (error) {
+
+      if (data.user) {
+        console.log('User logged in:', data.user.id)
+        toast.success('Connexion réussie!')
+        
+        // Get user role
+        const { data: userData, error: roleError } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', data.user.id)
+          .single()
+
+        console.log('User role data:', userData, 'Error:', roleError)
+
+        // Redirect based on role
+        const redirectPath = userData?.role === 'ADMIN' ? '/admin' : '/compte'
+        console.log('Redirecting to:', redirectPath)
+        
+        // Force a full page navigation
+        window.location.replace(redirectPath)
+      }
+    } catch (err) {
+      console.error('Login error:', err)
       toast.error('Une erreur est survenue')
-    } finally {
       setIsLoading(false)
     }
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }))
   }
 
   return (
@@ -84,8 +103,8 @@ export default function LoginPage() {
                 name="email"
                 type="email"
                 placeholder="votre@email.com"
-                value={formData.email}
-                onChange={handleChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="pl-10"
                 disabled={isLoading}
@@ -102,8 +121,8 @@ export default function LoginPage() {
                 name="password"
                 type="password"
                 placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 className="pl-10"
                 disabled={isLoading}
